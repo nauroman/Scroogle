@@ -6,28 +6,37 @@ namespace Flashunity.Scroogle
     public static class Scroggle
     {
 
+        /// <summary>Mininum length of a word. Should be more than 1</summary>
         static int minWordLength;
         // yox
         // rba
         // ved
+        /// <summary>Square game board. Each Cell is a letter, multiplier, cell index and neigbors cells</summary>
         private static Cell[] board;
+
+        /// <summary>Game board width. Should be more then 1</summary>
         private static int boardWidth;
+
+        /// <summary>Game board height. Should be more then 1</summary>
         private static int boardHeight;
 
-        private static Dictionary<string, string> dictionary;
+        /// <summary>Words dictionary. It runs fast for ContainsKey, according that article: http://cc.davelozinski.com/c-sharp/fastest-collection-for-string-lookups</summary>
+        private static Dictionary<string, bool> dictionary;
+
+        /// <summary>Multiplier for each letter</summary>
         private static Dictionary<char, int> lettersMultipliers;
+
+        /// <summary>Score for word length. For default (max) length use key 0</summary>
         private static Dictionary<int, int> wordLenghtScores;
 
-        /// <summary>
-        /// Set all board parameters and return all words and total score     
-        /// </summary>
-        public static string[] SetBoard(int boardWidth, int minWordLength, char[] letters, int[] multipliers, Dictionary<string, string> dictionary, Dictionary<char, int> lettersMultipliers, Dictionary<int, int> wordLenghtScores, out int totalScore)
+        /// <summary>Set all board parameters and return all possible words and total score</summary>
+        public static string[] SetBoard(int boardWidth, int minWordLength, char[] letters, int[] multipliers, Dictionary<string, bool> dictionary, Dictionary<char, int> lettersMultipliers, Dictionary<int, int> wordLenghtScores, out int totalScore)
         {
             totalScore = 0;
 
-            if (boardWidth <= 0 || boardWidth > letters.Length || letters.Length % boardWidth != 0)
+            if (boardWidth <= 1 || boardWidth > letters.Length || letters.Length % boardWidth != 0)
             {
-                throw new ArgumentOutOfRangeException("boardWidth", boardWidth, "Should be more than 0 and less then letters amount");
+                throw new ArgumentOutOfRangeException("boardWidth", boardWidth, "Should be more than 1 and less then letters amount");
                 return new string[0];
             }
 
@@ -66,7 +75,9 @@ namespace Flashunity.Scroogle
             return GetAllWords(ref totalScore);
         }
 
-        static string[] GetAllWords(ref int totalScore)
+
+        /// <summary>Get all words and total score</summary>
+        public static string[] GetAllWords(ref int totalScore)
         {
             totalScore = 0;
             var words = new List<string>();
@@ -81,6 +92,7 @@ namespace Flashunity.Scroogle
             return words.ToArray();
         }
 
+        /// <summary>Recursive function to collect all possible words for the cell</summary>
         static void GetNextCell(Cell cell, string word, List<string> words, ref int totalScore, List<Cell> usedCells)
         {
             if (!usedCells.Contains(cell))
@@ -115,9 +127,7 @@ namespace Flashunity.Scroogle
         }
 
 
-        /// <summary>
-        /// return total score for selected board indices
-        /// </summary>
+        /// <summary>Return total score for selected board indices</summary>
         public static int GetIndicesScore(int[] indices)
         {
             if (indices.Length <= 1 || indices.Length > board.Length)
@@ -134,6 +144,7 @@ namespace Flashunity.Scroogle
             return GetCellsScore(cells);
         }
 
+        /// <summary>Returns score for cells using cells multiplier and letters multiplier</summary>
         static int GetCellsScore(Cell[] cells)
         {
             if (cells.Length < minWordLength) return 0;
@@ -151,6 +162,7 @@ namespace Flashunity.Scroogle
             return score;
         }
 
+        /// <summary>Returns score for a cell using the cell multiplier and the letter multiplier</summary>
         static int GetCellScore(Cell cell)
         {
             int score;
@@ -161,6 +173,7 @@ namespace Flashunity.Scroogle
             return score;
         }
 
+        /// <summary>Convert letters and multipliers to Cells and add cells to the board</summary>
         static void FillBoard(char[] letters, int[] multipliers)
         {
             board = new Cell[letters.Length];
@@ -168,16 +181,19 @@ namespace Flashunity.Scroogle
             for (int i = 0; i < letters.Length; i++)
                 board[i] = new Cell(letters[i], i, multipliers[i]);
 
-            UpdateCellsNeigbors();
+            // add neighbors for each cell
+            UpdateCellsNeighbors();
         }
 
-        static void UpdateCellsNeigbors()
+        /// <summary>add neighbors for each cell</summary>
+        static void UpdateCellsNeighbors()
         {
             for (int i = 0; i < board.Length; i++)
-                UpdateCellNeigbors(board[i]);
+                UpdateCellNeighbors(board[i]);
         }
 
-        static void UpdateCellNeigbors(Cell cell)
+        /// <summary>Update cell neighbors - cells from left, right, top and bottom</summary>
+        static void UpdateCellNeighbors(Cell cell)
         {
             int cellX;
             int cellY;
@@ -191,11 +207,12 @@ namespace Flashunity.Scroogle
                     {
                         int index = GetIndexByCoords(x, y);
                         if (index != -1)
-                            cell.AddNeighbor(board[index]);
+                            cell.neighbors.Add(board[index]);
                     }
                 }
         }
 
+        /// <summary>Returns coord by single dimension board index</summary>
         internal static bool GetCoordsByIndex(int index, out int x, out int y)
         {
             if (index < 0 || index >= board.Length)
@@ -210,6 +227,7 @@ namespace Flashunity.Scroogle
             return true;
         }
 
+        /// <summary>Returns single dimension board index by coord</summary>
         internal static int GetIndexByCoords(int x, int y)
         {
             if (x < 0 || x >= boardWidth || y < 0 || y >= boardHeight)
@@ -217,11 +235,12 @@ namespace Flashunity.Scroogle
                 return -1;
             }
 
-            return boardHeight * y + x;
+            return boardWidth * y + x;
         }
 
     }
 
+    /// <summary>Game board cell. Each Cell is a letter, multiplier, cell index and neigbors cells</summary>
     class Cell
     {
         public readonly char letter;
@@ -235,11 +254,6 @@ namespace Flashunity.Scroogle
             this.multiplier = multiplier;
             this.index = index;
             neighbors = new List<Cell>();
-        }
-
-        public void AddNeighbor(Cell cell)
-        {
-            neighbors.Add(cell);
         }
 
     }

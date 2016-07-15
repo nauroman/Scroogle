@@ -20,7 +20,7 @@ namespace MonoTests.Flashunity.Scroogle
 
         char[] letters;
         int[] multipliers = new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-        Dictionary<string, string> dictionary;
+        Dictionary<string, bool> dictionary;
         //        Dictionary<char, int> lettersMultipliers = new Dictionary<char, int> { { 'q', 3 }, { 'z', 2 }, { 'k', 2 } };
         Dictionary<char, int> lettersMultipliers = new Dictionary<char, int> { { 'y', 3 }, { 'o', 2 }, { 'k', 2 } };
         Dictionary<int, int> wordLenghtScores = new Dictionary<int, int> { { 2, 1 }, { 3, 1 }, { 4, 1 }, { 5, 2 }, { 6, 3 }, { 7, 5 }, { 0, 11 } };
@@ -29,7 +29,8 @@ namespace MonoTests.Flashunity.Scroogle
         {
             var arr = dictionaryString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-            dictionary = arr.ToDictionary(item => item, item => item);
+            //dictionary = arr.ToDictionary(item => item, item => item);
+            dictionary = arr.ToDictionary(item => item, item => true);
             letters = lettersString.ToCharArray();
         }
 
@@ -59,7 +60,7 @@ namespace MonoTests.Flashunity.Scroogle
             }
             catch (Exception e)
             {
-                Assert.True(e.Message.IndexOf("Should be more than 0 and less then letters amount") == 0, "board width is 0");
+                Assert.True(e.Message.IndexOf("Should be more than 1 and less then letters amount") == 0, "board width is 0");
             }
         }
 
@@ -83,11 +84,12 @@ namespace MonoTests.Flashunity.Scroogle
             int totalScore;
             try
             {
-                Scroggle.SetBoard(1, minWordLength, new char[] { 'r' }, multipliers, dictionary, lettersMultipliers, wordLenghtScores, out totalScore);
+                Scroggle.SetBoard(2, 3, new char[] { 'a', 'b' }, new int[] { 1, 1 }, dictionary, lettersMultipliers, wordLenghtScores, out totalScore);
             }
             catch (Exception e)
             {
-                Assert.True(e.Message.IndexOf("Should be minWordLength letters or more") == 0, "1 letter");
+                Console.WriteLine(e.Message);
+                Assert.True(e.Message.IndexOf("Should be minWordLength letters or more") == 0, "2 letters");
             }
         }
 
@@ -111,7 +113,8 @@ namespace MonoTests.Flashunity.Scroogle
             int totalScore;
             try
             {
-                Scroggle.SetBoard(3, minWordLength, letters, multipliers, new Dictionary<string, string> { }, lettersMultipliers, wordLenghtScores, out totalScore);
+                //    Scroggle.SetBoard(3, minWordLength, letters, multipliers, new Dictionary<string, string> { }, lettersMultipliers, wordLenghtScores, out totalScore);
+                Scroggle.SetBoard(3, minWordLength, letters, multipliers, new Dictionary<string, bool> { }, lettersMultipliers, wordLenghtScores, out totalScore);
             }
             catch (Exception e)
             {
@@ -193,9 +196,64 @@ namespace MonoTests.Flashunity.Scroogle
             Assert.AreEqual(6, Scroggle.GetIndicesScore(new int[] { 0, 1, 2, 3 }), "0,1,2,3");
         }
 
+        [Test]
+        public void AllWords2x2()
+        {
+            int totalScore;
+            var allWords = Scroggle.SetBoard(2, 2, new char[] { 'a', 'b', 'c', 'd' }, new int[] { 1, 1, 1, 1 },
+                                             new Dictionary<string, bool> { { "ab", true } }, new Dictionary<char, int> { { 'a', 1 } },
+                                             wordLenghtScores, out totalScore);
+            Assert.AreEqual(1, totalScore, "totalScore=1");
+            Assert.AreEqual(1, allWords.Length, "allWords=1");
+            Assert.AreEqual("ab", allWords[0], "allWords[0]");
+        }
 
         [Test]
-        public void AllWords()
+        public void AllWords2x3()
+        {
+            int totalScore;
+            var allWords = Scroggle.SetBoard(2, 2, new char[] { 'a', 'b', 'c', 'd', 'e', 'f' }, new int[] { 1, 1, 1, 1, 1, 1 },
+                                             new Dictionary<string, bool> { { "ab", true } }, new Dictionary<char, int> { { 'a', 1 } },
+                                             wordLenghtScores, out totalScore);
+            Assert.AreEqual(1, totalScore, "totalScore=1");
+            Assert.AreEqual(1, allWords.Length, "allWords=1");
+
+            allWords = Scroggle.SetBoard(2, 2, new char[] { 'a', 'b', 'c', 'd', 'e', 'f' }, new int[] { 1, 1, 1, 1, 1, 1 },
+                                 new Dictionary<string, bool> { { "ab", true } }, new Dictionary<char, int> { { 'a', 1 } },
+                                 wordLenghtScores, out totalScore);
+            Assert.AreEqual(1, totalScore, "totalScore=1");
+            Assert.AreEqual(1, allWords.Length, "allWords=1");
+
+            allWords = Scroggle.SetBoard(2, 2, new char[] { 'a', 'b', 'c', 'd', 'e', 'f' }, new int[] { 1, 1, 1, 1, 1, 1 },
+                     new Dictionary<string, bool> { { "ab", true }, { "bc", true } }, new Dictionary<char, int> { { 'a', 1 } },
+                     wordLenghtScores, out totalScore);
+            Assert.AreEqual(2, totalScore, "totalScore=2");
+            Assert.AreEqual(2, allWords.Length, "allWords=2");
+            Assert.AreEqual("ab", allWords[0], "allWords[0]");
+            Assert.AreEqual("bc", allWords[1], "allWords[1]");
+
+            allWords = Scroggle.SetBoard(2, 2, new char[] { 'a', 'b', 'c', 'd', 'e', 'f' }, new int[] { 1, 1, 1, 1, 1, 1 },
+         new Dictionary<string, bool> { { "ab", true }, { "bc", true }, { "abcdef", true } }, new Dictionary<char, int> { { 'a', 1 } },
+         wordLenghtScores, out totalScore);
+            Assert.AreEqual(5, totalScore, "totalScore=3");
+            Assert.AreEqual(3, allWords.Length, "allWords=3");
+
+            allWords = Scroggle.SetBoard(2, 2, new char[] { 'a', 'b', 'c', 'd', 'e', 'f' }, new int[] { 2, 1, 1, 1, 1, 1 },
+new Dictionary<string, bool> { { "ab", true }, { "bc", true }, { "abcdef", true } }, new Dictionary<char, int> { { 'a', 2 } },
+wordLenghtScores, out totalScore);
+            Assert.AreEqual(17, totalScore, "totalScore=17");
+            Assert.AreEqual(3, allWords.Length, "allWords=3");
+
+            allWords = Scroggle.SetBoard(2, 2, new char[] { 'a', 'b', 'c', 'd', 'e', 'f' }, new int[] { 2, 2, 1, 1, 1, 1 },
+new Dictionary<string, bool> { { "ab", true } }, new Dictionary<char, int> { { 'a', 2 }, { 'b', 3 } },
+wordLenghtScores, out totalScore);
+            Assert.AreEqual(24, totalScore, "totalScore=24");
+            Assert.AreEqual(1, allWords.Length, "allWords=3");
+
+        }
+
+        [Test]
+        public void AllWords3x3()
         {
             int totalScore;
             var allWords = Scroggle.SetBoard(3, minWordLength, letters, multipliers, dictionary, lettersMultipliers, wordLenghtScores, out totalScore);

@@ -7,37 +7,47 @@ Scroogle game code
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Flashunity.Scroogle;
 
-class MainClass
+namespace Flashunity.Scroogle
 {
-    static int minWordLength = 4;
-    static string lettersString = "yoxrbaved";
-
-    // yox
-    // rba
-    // ved
-
-    static string dictionaryString = "bred,yore,byre,abed,oread,bore,orby,robed,broad,byroad,robe,bored,derby,bade,aero,read,orbed,verb,aery,bead,bread,very,road";
-
-    static char[] letters;
-    static int[] multipliers = new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-    static Dictionary<string, string> dictionary;
-    static Dictionary<char, int> lettersMultipliers = new Dictionary<char, int> { { 'y', 3 }, { 'o', 2 }, { 'k', 2 } };
-    static Dictionary<int, int> wordLenghtScores = new Dictionary<int, int> { { 2, 1 }, { 3, 1 }, { 4, 1 }, { 5, 2 }, { 6, 3 }, { 7, 5 }, { 0, 11 } };
-
-    public static void Main(string[] args)
+    class MainClass
     {
-        var arr = dictionaryString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        public static void Main(string[] args)
+        {
+            SetBoard();
+        }
 
-        dictionary = arr.ToDictionary(item => item, item => item);
-        letters = lettersString.ToCharArray();
+        /// <summary>Set all board parameters and return all possible words and total score</summary>
+        static void SetBoard()
+        {
+            int minWordLength = 4;
+            string lettersString = "yoxrbaved";
 
-        int totalScore;
-        var allWords = Scroggle.SetBoard(3, minWordLength, letters, multipliers, dictionary, lettersMultipliers, wordLenghtScores, out totalScore);
+            // yox
+            // rba
+            // ved
 
-        Console.WriteLine("allWords.Length: " + allWords.Length);
-        Console.WriteLine("score: " + totalScore);
+            string dictionaryString = "i,need,this,job,give,me,a,chance,and,you,wont,regret,bred,yore,byre,abed,oread,bore,orby,robed,broad,byroad,robe,bored,derby,bade,aero,read,orbed,verb,aery,bead,bread,very,road";
+
+            char[] letters;
+            int[] multipliers = new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+            Dictionary<string, bool> dictionary;
+            Dictionary<char, int> lettersMultipliers = new Dictionary<char, int> { { 'y', 3 }, { 'o', 2 }, { 'k', 2 } };
+            Dictionary<int, int> wordLenghtScores = new Dictionary<int, int> { { 2, 1 }, { 3, 1 }, { 4, 1 }, { 5, 2 }, { 6, 3 }, { 7, 5 }, { 0, 11 } };
+
+            var arr = dictionaryString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            dictionary = arr.ToDictionary(item => item, item => true);
+            letters = lettersString.ToCharArray();
+
+            // getting all words for 3x3 board
+            int totalScore;
+            var allWords = Scroggle.SetBoard(3, minWordLength, letters, multipliers, dictionary, lettersMultipliers, wordLenghtScores, out totalScore);
+
+            Console.WriteLine("allWords.Length: " + allWords.Length);
+            Console.WriteLine("score: " + totalScore);
+        }
     }
 }
+
 ```
