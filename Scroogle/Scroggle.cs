@@ -102,7 +102,7 @@ namespace Flashunity.Scroogle
 
                 if (word.Length >= minWordLength)
                 {
-                    if (dictionary.ContainsKey(word))
+                    if (dictionary.ContainsKey(word) && !words.Contains(word))
                     {
                         words.Add(word);
                         totalScore += GetCellsScore(usedCells.ToArray());
