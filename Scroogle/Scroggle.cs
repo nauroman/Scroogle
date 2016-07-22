@@ -1,4 +1,16 @@
-﻿using System;
+﻿// Ways to improve:
+//
+// Improve dictionary - remove from it words length < minWordLength and length > boardWidth * boardHeight
+// and split dictionary to 26 dictionaries where each dictionary starts from a letter from english alphabet
+// Move dictionary to a class 
+//
+// Improve function GetNextCell - words.Contains(word) can be optimized like dictionary does (Dictionary<char, int>)
+// 
+// Use threads to looking in dictionary
+//
+// function SetBoard has too many parameters - It's only for the test task
+
+using System;
 using System.Collections.Generic;
 
 namespace Flashunity.Scroogle
@@ -64,6 +76,12 @@ namespace Flashunity.Scroogle
                 return new string[0];
             }
 
+            if (wordLenghtScores.Count <= 0)
+            {
+                throw new ArgumentOutOfRangeException("wordLenghtScores", dictionary, "Length must be more than 0");
+                return new string[0];
+            }
+
             Scroggle.boardWidth = boardWidth;
             Scroggle.boardHeight = letters.Length / boardWidth;
             Scroggle.minWordLength = minWordLength;
@@ -116,7 +134,6 @@ namespace Flashunity.Scroogle
 
                 if (!usedCells.Contains(neighbor))
                 {
-                    //                    thisCellUsedCells.Add(neighbor);
                     GetNextCell(neighbor, word, words, ref totalScore, usedCells);
                 }
             }
@@ -166,7 +183,7 @@ namespace Flashunity.Scroogle
         static int GetCellScore(Cell cell)
         {
             int score;
-            if (!lettersMultipliers.TryGetValue(cell.letter, out score)) score = 1;
+            if (lettersMultipliers == null || !lettersMultipliers.TryGetValue(cell.letter, out score)) score = 1;
 
             score = score * cell.multiplier;
 
@@ -255,8 +272,6 @@ namespace Flashunity.Scroogle
             this.index = index;
             neighbors = new List<Cell>();
         }
-
     }
-
 }
 

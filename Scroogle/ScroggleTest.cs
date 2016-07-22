@@ -29,7 +29,6 @@ namespace MonoTests.Flashunity.Scroogle
         {
             var arr = dictionaryString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-            //dictionary = arr.ToDictionary(item => item, item => item);
             dictionary = arr.ToDictionary(item => item, item => true);
             letters = lettersString.ToCharArray();
         }
@@ -94,6 +93,21 @@ namespace MonoTests.Flashunity.Scroogle
         }
 
         [Test]
+        public void WrongDictionary()
+        {
+            int totalScore;
+            try
+            {
+                //    Scroggle.SetBoard(3, minWordLength, letters, multipliers, new Dictionary<string, string> { }, lettersMultipliers, wordLenghtScores, out totalScore);
+                Scroggle.SetBoard(3, minWordLength, letters, multipliers, new Dictionary<string, bool> { }, lettersMultipliers, wordLenghtScores, out totalScore);
+            }
+            catch (Exception e)
+            {
+                Assert.True(e.Message.IndexOf("Length must be more than 0") == 0, "dictionary length is 0");
+            }
+        }
+
+        [Test]
         public void WrongMultipliers()
         {
             int totalScore;
@@ -108,19 +122,19 @@ namespace MonoTests.Flashunity.Scroogle
         }
 
         [Test]
-        public void WrongDictionary()
+        public void WrongLenghtScores()
         {
             int totalScore;
             try
             {
-                //    Scroggle.SetBoard(3, minWordLength, letters, multipliers, new Dictionary<string, string> { }, lettersMultipliers, wordLenghtScores, out totalScore);
-                Scroggle.SetBoard(3, minWordLength, letters, multipliers, new Dictionary<string, bool> { }, lettersMultipliers, wordLenghtScores, out totalScore);
+                Scroggle.SetBoard(3, minWordLength, letters, new int[] { 1, 1, 1 }, dictionary, lettersMultipliers, new Dictionary<int, int>(), out totalScore);
             }
             catch (Exception e)
             {
-                Assert.True(e.Message.IndexOf("Length must be more than 0") == 0, "dictionary length is 0");
+                Assert.True(e.Message.IndexOf("Should be equal to letters length") == 0, "0 wordLenghtScores");
             }
         }
+
 
         [Test]
         public void GetCoordsByIndex()
